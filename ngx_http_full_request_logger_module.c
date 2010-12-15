@@ -18,7 +18,7 @@ typedef struct {
 static void *ngx_http_full_request_logger_create_main_conf(ngx_conf_t *cf);
 static void *ngx_http_full_request_logger_create_loc_conf(ngx_conf_t *cf);
 static char *ngx_http_full_request_logger_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child);
-static ngx_int_t ngx_http_full_request_logger_init(ngx_http_full_request_logger_loc_conf_t *cf);
+static ngx_int_t ngx_http_full_request_logger_init(ngx_conf_t *cf);
 
 static ngx_command_t ngx_http_full_request_logger_commands[] = {
     { ngx_string("enable"),
@@ -67,27 +67,27 @@ ngx_module_t ngx_http_full_request_logger_module = {
 
 static ngx_int_t ngx_http_full_request_logger_handler(ngx_http_request_t *r)
 {
-    ngx_http_full_request_logger_loc_conf_t  *lcf;
+    ngx_http_full_request_logger_loc_conf_t *lcf;
+    
     lcf = ngx_http_get_module_loc_conf(r, ngx_http_full_request_logger_module);
     
     if (lcf->off) {
         return NGX_OK;
     }
     
-    return ngx_http_output_filter(r, &out);
+    return NGX_OK;
 }
 
 static ngx_int_t ngx_http_full_request_logger_init(ngx_conf_t *cf)
 {
     ngx_http_handler_pt *h;
-    ngx_http_full_reqeust_logger_main_conf_t *lmcf;
-    ngx_http_full_request_logger_loc_conf_t *lcf;
+    ngx_http_full_request_logger_main_conf_t *lmcf;
     ngx_http_core_main_conf_t  *cmcf;
     
     lmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_full_request_logger_module);
     cmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_core_module);
     
-    if (lmcf->enabled) {
+    if (lmcf->enable) {
         h = ngx_array_push(&cmcf->phases[NGX_HTTP_LOG_PHASE].handlers);
         if (h == NULL) {
             return NGX_ERROR;
