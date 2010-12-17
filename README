@@ -1,6 +1,5 @@
-In order to provide more insight into the specific nature and content of requests 
-you may be receiving (or proxying to backend applications) we developed this 
-module to fully log a request.
+We developed this module in order to provide more insight into the specific 
+nature and content of requests you're receiving (or proxying to backend applications).
 
 It can be globally enabled/disabled at the server level and additionally toggled 
 at any deeper granularity to log to a specific file for a given location/etc.
