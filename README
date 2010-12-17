@@ -1,7 +1,9 @@
-In order to provide more insight into the specific nature and content of requests you may be receiving (or proxying to backend applications) we
-developed this module to fully log a request.
+In order to provide more insight into the specific nature and content of requests 
+you may be receiving (or proxying to backend applications) we developed this 
+module to fully log a request.
 
-It can be globally enabled/disabled at the server level and additionally defined at any deeper granularity to log to different files.
+It can be globally enabled/disabled at the server level and additionally defined 
+at any deeper granularity to log to different files.
 
 NOTE:
 tested w/ nginx 0.7.67 on CentOS 64
