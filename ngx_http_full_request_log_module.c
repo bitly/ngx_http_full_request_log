@@ -104,7 +104,7 @@ static ngx_int_t ngx_http_full_request_log_handler(ngx_http_request_t *r)
         return NGX_OK;
     }
     
-    len = 0;
+    len = 50 + sizeof(CRLF) - 1 + ngx_cached_http_log_time.len + sizeof(CRLF) - 1 + sizeof(CRLF) - 1 + r->request_line.len + sizeof(CRLF) - 1;
     part = &r->headers_in.headers.part;
     header = part->elts;
     for (i = 0; /* void */; i++) {
@@ -124,6 +124,16 @@ static ngx_int_t ngx_http_full_request_log_handler(ngx_http_request_t *r)
     if (b == NULL) {
         return NGX_ERROR;
     }
+    
+    b->last = ngx_copy(b->last, "--------------------------------------------------", 50);
+    *b->last++ = CR; *b->last++ = LF;
+    
+    b->last = ngx_copy(b->last, ngx_cached_http_log_time.data, ngx_cached_http_log_time.len);
+    *b->last++ = CR; *b->last++ = LF;
+    *b->last++ = CR; *b->last++ = LF;
+    
+    b->last = ngx_copy(b->last, r->request_line.data, r->request_line.len);
+    *b->last++ = CR; *b->last++ = LF;
     
     part = &r->headers_in.headers.part;
     header = part->elts;
