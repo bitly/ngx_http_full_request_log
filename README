@@ -1,0 +1,5 @@
+nginx module to log the full request content in order to provide more insight into the types of requests you may be receiving (or proxying to backend applications).
+
+it can be globally enabled/disabled at the server level and additionally defined at any deeper granularity to log to different files
+
+tested w/ nginx 0.7.67 on CentOS 64
