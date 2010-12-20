@@ -80,7 +80,11 @@ static ngx_int_t ngx_http_full_request_log_handler(ngx_http_request_t *r)
 {
     ngx_http_full_request_log_loc_conf_t    *lcf;
     ngx_http_full_request_log_t             *log;
-    u_char                                  *line;
+    size_t                                  len;
+    ngx_buf_t                               *b;
+    ngx_uint_t                              i;
+    ngx_list_part_t                         *part;
+    ngx_table_elt_t                         *header;
     
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "http full request log handler");
     
@@ -100,14 +104,59 @@ static ngx_int_t ngx_http_full_request_log_handler(ngx_http_request_t *r)
         return NGX_OK;
     }
     
-    //line = ngx_pnalloc(r->pool, len);
-    //if (line == NULL) {
-    //    return NGX_ERROR;
-    //}
+    len = 50 + sizeof(CRLF) - 1 + ngx_cached_http_log_time.len + sizeof(CRLF) - 1 + sizeof(CRLF) - 1 + r->request_line.len + sizeof(CRLF) - 1;
+    part = &r->headers_in.headers.part;
+    header = part->elts;
+    for (i = 0; /* void */; i++) {
+        if (i >= part->nelts) {
+            if (part->next == NULL) {
+                break;
+            }
+            
+            part = part->next;
+            header = part->elts;
+            i = 0;
+        }
+        len += header[i].key.len + sizeof(": ") - 1 + header[i].value.len + sizeof(CRLF) - 1;
+    }
     
-    line = (u_char *)"hello \n";
+    b = ngx_create_temp_buf(r->pool, len);
+    if (b == NULL) {
+        return NGX_ERROR;
+    }
     
-    ngx_http_full_request_log_write(r, log, line, 7);
+    b->last = ngx_copy(b->last, "--------------------------------------------------", 50);
+    *b->last++ = CR; *b->last++ = LF;
+    
+    b->last = ngx_copy(b->last, ngx_cached_http_log_time.data, ngx_cached_http_log_time.len);
+    *b->last++ = CR; *b->last++ = LF;
+    *b->last++ = CR; *b->last++ = LF;
+    
+    b->last = ngx_copy(b->last, r->request_line.data, r->request_line.len);
+    *b->last++ = CR; *b->last++ = LF;
+    
+    part = &r->headers_in.headers.part;
+    header = part->elts;
+    for (i = 0; /* void */; i++) {
+        if (i >= part->nelts) {
+            if (part->next == NULL) {
+                break;
+            }
+            
+            part = part->next;
+            header = part->elts;
+            i = 0;
+        }
+        
+        b->last = ngx_copy(b->last, header[i].key.data, header[i].key.len);
+        *b->last++ = ':'; *b->last++ = ' ';
+        b->last = ngx_copy(b->last, header[i].value.data, header[i].value.len);
+        *b->last++ = CR; *b->last++ = LF;
+        
+        ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "http full request log header: \"%V: %V\"", &header[i].key, &header[i].value);
+    }
+    
+    ngx_http_full_request_log_write(r, log, b->pos, len);
     
     return NGX_OK;
 }
