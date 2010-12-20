@@ -82,9 +82,9 @@ static ngx_int_t ngx_http_full_request_log_handler(ngx_http_request_t *r)
     ngx_http_full_request_log_t             *log;
     u_char                                  *line;
     
-    lcf = ngx_http_get_module_loc_conf(r, ngx_http_full_request_log_module);
-    
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "http full request log handler");
+    
+    lcf = ngx_http_get_module_loc_conf(r, ngx_http_full_request_log_module);
     
     if (lcf->off) {
         return NGX_OK;
