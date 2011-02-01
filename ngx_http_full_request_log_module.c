@@ -268,7 +268,7 @@ static void *ngx_http_full_request_log_create_loc_conf(ngx_conf_t *cf)
         return NGX_CONF_ERROR;
     }
     
-    conf->off = 1;
+    conf->off = NGX_CONF_UNSET;
     
     return conf;
 }
@@ -278,7 +278,7 @@ static char *ngx_http_full_request_log_merge_loc_conf(ngx_conf_t *cf, void *pare
     ngx_http_full_request_log_loc_conf_t *prev = parent;
     ngx_http_full_request_log_loc_conf_t *conf = child;
     
-    if (conf->log || conf->off) {
+    if (conf->log || (conf->off != NGX_CONF_UNSET)) {
         return NGX_CONF_OK;
     }
     

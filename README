@@ -6,3 +6,6 @@ at any deeper granularity to log to a specific file for a given location/etc.
 
 NOTE:
 tested w/ nginx 0.7.67 on CentOS 64
+
+FOR TESTING:
+./configure --prefix=/bitly/local --with-http_stub_status_module --with-pcre=/bitly/src/pcre-7.8 --with-openssl=/bitly/src/openssl-0.9.8j --with-http_ssl_module --add-module=/bitly/src/github/ngx_http_full_request_log --with-debug
